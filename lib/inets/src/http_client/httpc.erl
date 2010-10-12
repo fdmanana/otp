@@ -126,7 +126,8 @@ request(Url, Profile) ->
 %%      Header = {Field, Value}
 %%	Field = string()
 %%	Value = string()
-%%	Body = string() | binary() | {fun(SendAcc) -> SendFunResult, SendAcc} - HTLM-code
+%%	Body = string() | binary() | {fun(SendAcc) -> SendFunResult, SendAcc} |
+%%              {chunkify, fun(SendAcc) -> SendFunResult, SendAcc} - HTLM-code
 %%      SendFunResult = eof | {ok, iolist(), NewSendAcc}
 %%      SendAcc = NewSendAcc = term()
 %%
