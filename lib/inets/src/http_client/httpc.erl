@@ -491,14 +491,13 @@ chunkify_fun(BodyFun) ->
             eof ->
                 {ok, <<"0\r\n\r\n">>, eof_body_fun};
             {ok, Data, NewAcc} ->
-                Bin = iolist_to_binary(Data),
-                Chunk = [hex_size(Bin), "\r\n", Bin, "\r\n"],
-                {ok, iolist_to_binary(Chunk), NewAcc}
+                Chunk = [
+                    integer_to_list(iolist_size(Data), 16), "\r\n",
+                    Data,
+                    "\r\n"],
+                {ok, Chunk, NewAcc}
         end
     end.
-
-hex_size(Bin) ->
-    hd(io_lib:format("~.16B", [size(Bin)])).
 
 handle_answer(RequestId, false, _) ->
     {ok, RequestId};
