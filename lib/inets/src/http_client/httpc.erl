@@ -126,8 +126,7 @@ request(Url, Profile) ->
 %%      Header = {Field, Value}
 %%	Field = string()
 %%	Value = string()
-%%	Body = string() | binary() | {fun(SendAcc) -> SendFunResult, SendAcc} |
-%%              {chunkify, fun(SendAcc) -> SendFunResult, SendAcc} - HTLM-code
+%%	Body = string() | binary() | {fun(SendAcc) -> SendFunResult, SendAcc}
 %%      SendFunResult = eof | {ok, iolist(), NewSendAcc}
 %%      SendAcc = NewSendAcc = term()
 %%
@@ -429,19 +428,22 @@ service_info(Pid) ->
 
 handle_request(Method, Url, 
 	       {Scheme, UserInfo, Host, Port, Path, Query}, 
-	       Headers0, ContentType, Body0,
+	       Headers, ContentType, Body0,
 	       HTTPOptions0, Options0, Profile) ->
 
     Started    = http_util:timestamp(), 
-    NewHeaders0 = [{http_util:to_lower(Key), Val} || {Key, Val} <- Headers0],
+    NewHeaders = [{http_util:to_lower(Key), Val} || {Key, Val} <- Headers],
 
-    {NewHeaders, Body} = case Body0 of
-        {chunkify, BodyFun, Acc} ->
-            NewHeaders1 = lists:keystore("transfer-encoding", 1,
-                NewHeaders0, {"transfer-encoding", "chunked"}),
-            {NewHeaders1, {chunkify_fun(BodyFun), Acc}};
-        _ ->
-            {NewHeaders0, Body0}
+    Body = case proplists:get_value("transfer-encoding", NewHeaders) of
+        "chunked" ->
+             case Body0 of
+                 {BodyFun, Acc} ->
+                     {chunkify_fun(BodyFun), Acc};
+                 _ ->
+                     Body0
+             end;
+         _ ->
+             Body0
     end,
 
     try
@@ -466,7 +468,7 @@ handle_request(Method, Url,
 			       abs_uri       = Url, 
 			       userinfo      = UserInfo, 
 			       stream        = Stream, 
-			       headers_as_is = headers_as_is(Headers0, Options),
+			       headers_as_is = headers_as_is(Headers, Options),
 			       socket_opts   = SocketOpts, 
 			       started       = Started},
 	    case httpc_manager:request(Request, profile_name(Profile)) of
