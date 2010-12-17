@@ -22,7 +22,7 @@
 
 %% External exports
 -export([start_link/2, start_link/3,
-	 start_child/2, restart_child/2,
+	 start_child/2, restart_child/2, restart_child/3,
 	 delete_child/2, terminate_child/2,
 	 which_children/1, count_children/1,
 	 check_childspecs/1]).
@@ -123,7 +123,12 @@ start_child(Supervisor, ChildSpec) ->
 -spec restart_child(sup_ref(), term()) ->
     {'ok', child_id()} | {'ok', child_id(), info()} | {'error', restart_err()}.
 restart_child(Supervisor, Name) ->
-    call(Supervisor, {restart_child, Name}).
+    call(Supervisor, {restart_child, Name, null}).
+
+-spec restart_child(sup_ref(), term(), [term()]) ->
+    {'ok', child_id()} | {'ok', child_id(), info()} | {'error', restart_err()}.
+restart_child(Supervisor, Name, NewChildArgs) ->
+    call(Supervisor, {restart_child, Name, NewChildArgs}).
 
 -type del_err() :: 'running' | 'not_found' | 'simple_one_for_one'.
 -spec delete_child(sup_ref(), term()) -> 'ok' | {'error', del_err()}.
@@ -312,9 +317,15 @@ handle_call({start_child, ChildSpec}, _From, State) ->
 	    {reply, {error, What}, State}
     end;
 
-handle_call({restart_child, Name}, _From, State) ->
+handle_call({restart_child, Name, NewArgs}, _From, State) ->
     case get_child(Name, State) of
-	{value, Child} when Child#child.pid =:= undefined ->
+	{value, #child{mfargs = {M, F, _}, pid = undefined} = Child1} ->
+        Child = case NewArgs of
+        null ->
+            Child1;
+        _ ->
+            Child1#child{mfargs = {M, F, NewArgs}}
+        end,
 	    case do_start_child(State#state.name, Child) of
 		{ok, Pid} ->
 		    NState = replace_child(Child#child{pid = Pid}, State),
@@ -424,7 +435,7 @@ handle_cast(null, State) ->
         {'noreply', state()} | {'stop', 'shutdown', state()}.
 
 handle_info({'EXIT', Pid, Reason}, State) ->
-    case restart_child(Pid, Reason, State) of
+    case restart_child_int(Pid, Reason, State) of
 	{ok, State1} ->
 	    {noreply, State1};
 	{shutdown, State1} ->
@@ -558,7 +569,7 @@ handle_start_child(Child, State) ->
 %%% Returns: {ok, state()} | {shutdown, state()}
 %%% ---------------------------------------------------
 
-restart_child(Pid, Reason, State) when ?is_simple(State) ->
+restart_child_int(Pid, Reason, State) when ?is_simple(State) ->
     case ?DICT:find(Pid, State#state.dynamics) of
 	{ok, Args} ->
 	    [Child] = State#state.children,
@@ -569,7 +580,7 @@ restart_child(Pid, Reason, State) when ?is_simple(State) ->
 	error ->
 	    {ok, State}
     end;
-restart_child(Pid, Reason, State) ->
+restart_child_int(Pid, Reason, State) ->
     Children = State#state.children,
     case lists:keyfind(Pid, #child.pid, Children) of
 	#child{} = Child ->
