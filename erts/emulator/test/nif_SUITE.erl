@@ -35,7 +35,7 @@
 	 resource_takeover/1,
 	 threading/1, send/1, send2/1, send3/1, send_threaded/1, neg/1, 
 	 is_checks/1,
-	 get_length/1, make_atom/1, make_string/1]).
+	 get_length/1, make_atom/1, make_string/1, number_operations/1]).
 
 -export([many_args_100/100]).
 
@@ -60,7 +60,7 @@ all() ->
      iolist_as_binary, resource, resource_binary,
      resource_takeover, threading, send, send2, send3,
      send_threaded, neg, is_checks, get_length, make_atom,
-     make_string].
+     make_string, number_operations].
 
 groups() -> 
     [].
@@ -1121,7 +1121,17 @@ is_checks(Config) when is_list(Config) ->
     ?line ensure_lib_loaded(Config, 1),
     ?line ok = check_is(hejsan, <<19,98>>, make_ref(), ok, fun() -> ok end,
 			self(), hd(erlang:ports()), [], [1,9,9,8],
-			{hejsan, "hejsan", [$h,"ejs",<<"an">>]}),
+			{hejsan, "hejsan", [$h,"ejs",<<"an">>]}, 12, 18446744073709551616),
+    ?line ok = check_is(hejsan, <<19,98>>, make_ref(), ok, fun() -> ok end,
+			self(), hd(erlang:ports()), [], [1,9,9,8],
+			{hejsan, "hejsan", [$h,"ejs",<<"an">>]}, 65796, 18446744073709551616),
+    ?line ok = check_is(hejsan, <<19,98>>, make_ref(), ok, fun() -> ok end,
+			self(), hd(erlang:ports()), [], [1,9,9,8],
+			{hejsan, "hejsan", [$h,"ejs",<<"an">>]}, 99.146, 1844674407370955161600),
+    ?line ok = check_is(hejsan, <<19,98>>, make_ref(), ok, fun() -> ok end,
+			self(), hd(erlang:ports()), [], [1,9,9,8],
+			{hejsan, "hejsan", [$h,"ejs",<<"an">>]}, 18446744073709551616,
+			1844674407370955161600),
     try
         ?line error = check_is_exception(),
         ?line throw(expected_badarg)
@@ -1163,6 +1173,104 @@ make_string(Config) when is_list(Config) ->
     A0String0 = [$a,0,$s,$t,$r,$i,$n,$g,0],
     AStringWithAccents = [$E,$r,$l,$a,$n,$g,$ ,16#e4,$r,$ ,$e,$t,$t,$ ,$g,$e,$n,$e,$r,$e,$l,$l,$t,$ ,$p,$r,$o,$g,$r,$a,$m,$s,$p,$r,16#e5,$k],
     ?line Strings = {A0String,A0String,A0String,A0String0, AStringWithAccents}.
+
+number_operations(doc) -> ["Test arithmetic and bitwise operations on numbers"];
+number_operations(suite) -> [];
+number_operations(Config) when is_list(Config) ->
+    ?line ensure_lib_loaded(Config, 1),
+    ?line 36893488147419103232 = sum_numbers(18446744073709551616, 18446744073709551616),
+    ?line 18446744073709551616 = sum_numbers(18446744073709551616, 0),
+    ?line 18446744073709551617 = sum_numbers(18446744073709551616, 1),
+    ?line 18446744073709551615 = sum_numbers(18446744073709551616, -1),
+    ?line 0 = sum_numbers(18446744073709551616, -18446744073709551616),
+    ?line 18446744073709551617 = sum_numbers(1, 18446744073709551616),
+    ?line 2 = sum_numbers(1, 1),
+    ?line {'EXIT', {badarith, _}} = (catch sum_numbers(18446744073709551616, foo)),
+
+    ?line 18446744073709551616 = subtract_numbers(36893488147419103232, 18446744073709551616),
+    ?line 18446744073709551616 = subtract_numbers(18446744073709551617, 1),
+    ?line 36893488147419103232 = subtract_numbers(18446744073709551616, -18446744073709551616),
+    ?line -18446744073709551616 = subtract_numbers(1, 18446744073709551617),
+    ?line 1 = subtract_numbers(2, 1),
+    ?line {'EXIT', {badarith, _}} = (catch subtract_numbers(18446744073709551616, foo)),
+
+    ?line 0 = multiply_numbers(18446744073709551616, 0),
+    ?line 18446744073709551616 = multiply_numbers(18446744073709551616, 1),
+    ?line 18446744073709551616 = multiply_numbers(1, 18446744073709551616),
+    ?line 36893488147419103232 = multiply_numbers(18446744073709551616, 2),
+    ?line -36893488147419103232 = multiply_numbers(-2, 18446744073709551616),
+    ?line 340282366920938463463374607431768211456 =
+        multiply_numbers(18446744073709551616, 18446744073709551616),
+    ?line 6 = multiply_numbers(3, 2),
+    ?line {'EXIT', {badarith, _}} = (catch multiply_numbers(18446744073709551616, foo)),
+
+    ?line 1.8446744073709552e19 = divide_numbers(18446744073709551616, 1),
+    ?line 5.421010862427522e-20 = divide_numbers(1, 18446744073709551616),
+    ?line 9.223372036854776e18 = divide_numbers(18446744073709551616, 2),
+    ?line 0.5 = divide_numbers(1, 2),
+    ?line {'EXIT', {badarith, _}} = (catch divide_numbers(18446744073709551616, 0)),
+    ?line {'EXIT', {badarith, _}} = (catch divide_numbers(18446744073709551616, foo)),
+
+    ?line 18446744073709551616 = int_divide_numbers(18446744073709551616, 1),
+    ?line 0 = int_divide_numbers(1, 18446744073709551616),
+    ?line 9223372036854775808 = int_divide_numbers(18446744073709551616, 2),
+    ?line 18446744073709551616 = int_divide_numbers(36893488147419103232, 2),
+    ?line 2 = int_divide_numbers(4, 2),
+    ?line {'EXIT', {badarith, _}} = (catch int_divide_numbers(18446744073709551616, 0)),
+    ?line {'EXIT', {badarith, _}} = (catch int_divide_numbers(18446744073709551616, 2.0)),
+    ?line {'EXIT', {badarith, _}} = (catch int_divide_numbers(18446744073709551616, foo)),
+
+    ?line 0 = remainder_numbers(18446744073709551616, 1),
+    ?line 0 = remainder_numbers(18446744073709551616, 2),
+    ?line 2 = remainder_numbers(36893488147419103232, 3),
+    ?line 0 = remainder_numbers(36893488147419103232, 2),
+    ?line 1 = remainder_numbers(36893488147419103233, 2),
+    ?line {'EXIT', {badarith, _}} = (catch remainder_numbers(18446744073709551616, 0)),
+    ?line {'EXIT', {badarith, _}} = (catch remainder_numbers(18446744073709551616, 2.0)),
+    ?line {'EXIT', {badarith, _}} = (catch remainder_numbers(18446744073709551616, foo)),
+
+    ?line 0 = band_numbers(16#10000000000000000, 1),
+    ?line 0 = band_numbers(16#10000000000000000, 0),
+    ?line 16#10000000000000000 = band_numbers(16#10000000000000000, 16#10000000000000000),
+    ?line 16#10000000000000000 = band_numbers(16#10000000000000001, 16#10000000000000000),
+    ?line {'EXIT', {badarith, _}} = (catch band_numbers(16#10000000000000000, 2.0)),
+    ?line {'EXIT', {badarith, _}} = (catch band_numbers(18446744073709551616, foo)),
+
+    ?line 16#10000000000000000 = bor_numbers(16#10000000000000000, 0),
+    ?line 16#10000000000000001 = bor_numbers(16#10000000000000000, 1),
+    ?line 16#10000000000000000 = bor_numbers(16#10000000000000000, 16#10000000000000000),
+    ?line 16#110000000000000001 = bor_numbers(16#010000000000000001, 16#110000000000000000),
+    ?line {'EXIT', {badarith, _}} = (catch bor_numbers(16#10000000000000000, 2.0)),
+    ?line {'EXIT', {badarith, _}} = (catch bor_numbers(18446744073709551616, foo)),
+
+    ?line 16#10000000000000000 = bxor_numbers(16#10000000000000000, 0),
+    ?line 16#10000000000000001 = bxor_numbers(16#10000000000000000, 1),
+    ?line 16#10000000000000000 = bxor_numbers(16#10000000000000001, 1),
+    ?line 0 = bxor_numbers(16#10000000000000001, 16#10000000000000001),
+    ?line 16#10 = bxor_numbers(16#10000000000000001, 16#10000000000000011),
+    ?line {'EXIT', {badarith, _}} = (catch bxor_numbers(16#10000000000000000, 2.0)),
+    ?line {'EXIT', {badarith, _}} = (catch bxor_numbers(18446744073709551616, foo)),
+
+    ?line -1 = bnot_number(0),
+    ?line -2 = bnot_number(1),
+    ?line 0 = bnot_number(-1),
+    ?line {'EXIT', {badarith, _}} = (catch bnot_number(2.0)),
+    ?line {'EXIT', {badarith, _}} = (catch bnot_number(foo)),
+
+    ?line 16#10000000000000001 = bsl_number(16#10000000000000001, 0),
+    ?line (2 * 16#10000000000000001) = bsl_number(16#10000000000000001, 1),
+    ?line (4 * 16#10000000000000001) = bsl_number(16#10000000000000001, 2),
+    ?line {'EXIT', {badarith, _}} = (catch bsl_number(16#10000000000000000, 2.0)),
+    ?line {'EXIT', {badarith, _}} = (catch bsl_number(18446744073709551616, foo)),
+
+    ?line 16#10000000000000001 = bsr_number(16#10000000000000001, 0),
+    ?line (16#10000000000000001 div 2) = bsr_number(16#10000000000000001, 1),
+    ?line (16#10000000000000001 div 4) = bsr_number(16#10000000000000001, 2),
+    ?line {'EXIT', {badarith, _}} = (catch bsr_number(16#10000000000000000, 2.0)),
+    ?line {'EXIT', {badarith, _}} = (catch bsr_number(18446744073709551616, foo)),
+
+    ok.
+
 
 tmpmem() ->
     case erlang:system_info({allocator,temp_alloc}) of
@@ -1251,7 +1359,7 @@ get_resource(_,_) -> ?nif_stub.
 release_resource(_) -> ?nif_stub.
 last_resource_dtor_call() -> ?nif_stub.
 make_new_resource(_,_) -> ?nif_stub.
-check_is(_,_,_,_,_,_,_,_,_,_) -> ?nif_stub.
+check_is(_,_,_,_,_,_,_,_,_,_,_,_) -> ?nif_stub.
 check_is_exception() -> ?nif_stub.
 length_test(_,_,_,_,_) -> ?nif_stub.
 make_atoms() -> ?nif_stub.
@@ -1269,6 +1377,18 @@ send_blob_thread(_,_,_) -> ?nif_stub.
 join_send_thread(_) -> ?nif_stub.
 copy_blob(_) -> ?nif_stub.
 send_term(_,_) -> ?nif_stub.
+sum_numbers(_,_) -> ?nif_stub.
+subtract_numbers(_,_) -> ?nif_stub.
+multiply_numbers(_,_) -> ?nif_stub.
+divide_numbers(_,_) -> ?nif_stub.
+int_divide_numbers(_,_) -> ?nif_stub.
+remainder_numbers(_,_) -> ?nif_stub.
+band_numbers(_,_) -> ?nif_stub.
+bor_numbers(_,_) -> ?nif_stub.
+bxor_numbers(_,_) -> ?nif_stub.
+bnot_number(_) -> ?nif_stub.
+bsl_number(_,_) -> ?nif_stub.
+bsr_number(_,_) -> ?nif_stub.
 
 nif_stub_error(Line) ->
     exit({nif_not_loaded,module,?MODULE,line,Line}).

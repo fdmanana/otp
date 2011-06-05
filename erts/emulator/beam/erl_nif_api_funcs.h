@@ -136,6 +136,20 @@ ERL_NIF_API_FUNC_DECL(ERL_NIF_TERM,enif_make_int64,(ErlNifEnv*, ErlNifSInt64));
 ERL_NIF_API_FUNC_DECL(ERL_NIF_TERM,enif_make_uint64,(ErlNifEnv*, ErlNifUInt64));
 #endif
 ERL_NIF_API_FUNC_DECL(int,enif_is_exception,(ErlNifEnv*, ERL_NIF_TERM term));
+ERL_NIF_API_FUNC_DECL(int,enif_is_number,(ErlNifEnv*, ERL_NIF_TERM term));
+ERL_NIF_API_FUNC_DECL(int,enif_is_big_number,(ErlNifEnv*, ERL_NIF_TERM term));
+ERL_NIF_API_FUNC_DECL(ERL_NIF_TERM,enif_sum,(ErlNifEnv*, ERL_NIF_TERM a, ERL_NIF_TERM b));
+ERL_NIF_API_FUNC_DECL(ERL_NIF_TERM,enif_subtract,(ErlNifEnv*, ERL_NIF_TERM a, ERL_NIF_TERM b));
+ERL_NIF_API_FUNC_DECL(ERL_NIF_TERM,enif_multiply,(ErlNifEnv*, ERL_NIF_TERM a, ERL_NIF_TERM b));
+ERL_NIF_API_FUNC_DECL(ERL_NIF_TERM,enif_divide,(ErlNifEnv*, ERL_NIF_TERM a, ERL_NIF_TERM b));
+ERL_NIF_API_FUNC_DECL(ERL_NIF_TERM,enif_integer_divide,(ErlNifEnv*, ERL_NIF_TERM a, ERL_NIF_TERM b));
+ERL_NIF_API_FUNC_DECL(ERL_NIF_TERM,enif_remainder,(ErlNifEnv*, ERL_NIF_TERM a, ERL_NIF_TERM b));
+ERL_NIF_API_FUNC_DECL(ERL_NIF_TERM,enif_band,(ErlNifEnv*, ERL_NIF_TERM a, ERL_NIF_TERM b));
+ERL_NIF_API_FUNC_DECL(ERL_NIF_TERM,enif_bor,(ErlNifEnv*, ERL_NIF_TERM a, ERL_NIF_TERM b));
+ERL_NIF_API_FUNC_DECL(ERL_NIF_TERM,enif_bxor,(ErlNifEnv*, ERL_NIF_TERM a, ERL_NIF_TERM b));
+ERL_NIF_API_FUNC_DECL(ERL_NIF_TERM,enif_bnot,(ErlNifEnv*, ERL_NIF_TERM a));
+ERL_NIF_API_FUNC_DECL(ERL_NIF_TERM,enif_bsl,(ErlNifEnv*, ERL_NIF_TERM a, ERL_NIF_TERM b));
+ERL_NIF_API_FUNC_DECL(ERL_NIF_TERM,enif_bsr,(ErlNifEnv*, ERL_NIF_TERM a, ERL_NIF_TERM b));
 
 /*
 ** Add new entries here to keep compatibility on Windows!!!
@@ -256,6 +270,20 @@ ERL_NIF_API_FUNC_DECL(int,enif_is_exception,(ErlNifEnv*, ERL_NIF_TERM term));
 #endif
 
 #  define enif_is_exception ERL_NIF_API_FUNC_MACRO(enif_is_exception)
+#  define enif_is_number ERL_NIF_API_FUNC_MACRO(enif_is_number)
+#  define enif_is_big_number ERL_NIF_API_FUNC_MACRO(enif_is_big_number)
+#  define enif_sum ERL_NIF_API_FUNC_MACRO(enif_sum)
+#  define enif_subtract ERL_NIF_API_FUNC_MACRO(enif_subtract)
+#  define enif_multiply ERL_NIF_API_FUNC_MACRO(enif_multiply)
+#  define enif_divide ERL_NIF_API_FUNC_MACRO(enif_divide)
+#  define enif_integer_divide ERL_NIF_API_FUNC_MACRO(enif_integer_divide)
+#  define enif_remainder ERL_NIF_API_FUNC_MACRO(enif_remainder)
+#  define enif_band ERL_NIF_API_FUNC_MACRO(enif_band)
+#  define enif_bor ERL_NIF_API_FUNC_MACRO(enif_bor)
+#  define enif_bxor ERL_NIF_API_FUNC_MACRO(enif_bxor)
+#  define enif_bnot ERL_NIF_API_FUNC_MACRO(enif_bnot)
+#  define enif_bsl ERL_NIF_API_FUNC_MACRO(enif_bsl)
+#  define enif_bsr ERL_NIF_API_FUNC_MACRO(enif_bsr)
 
 /*
 ** Add new entries here

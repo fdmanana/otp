@@ -435,6 +435,172 @@ int enif_is_exception(ErlNifEnv* env, ERL_NIF_TERM term)
     return term == THE_NON_VALUE;
 }
 
+int enif_is_number(ErlNifEnv* env, ERL_NIF_TERM term)
+{
+    return is_number(term);
+}
+
+int enif_is_big_number(ErlNifEnv* env, ERL_NIF_TERM term)
+{
+    return is_big(term);
+}
+
+ERL_NIF_TERM enif_sum(ErlNifEnv* env, ERL_NIF_TERM a, ERL_NIF_TERM b)
+{
+    Eterm result;
+
+    if (!is_number(a) || !is_number(b)) {
+        BIF_ERROR(env->proc, BADARITH);
+    }
+
+    result = splus_2(env->proc, a, b);
+    return enif_make_copy(env, result);
+}
+
+ERL_NIF_TERM enif_subtract(ErlNifEnv* env, ERL_NIF_TERM a, ERL_NIF_TERM b)
+{
+    Eterm result;
+
+    if (!is_number(a) || !is_number(b)) {
+        BIF_ERROR(env->proc, BADARITH);
+    }
+
+    result = sminus_2(env->proc, a, b);
+    return enif_make_copy(env, result);
+}
+
+ERL_NIF_TERM enif_multiply(ErlNifEnv* env, ERL_NIF_TERM a, ERL_NIF_TERM b)
+{
+    Eterm result;
+
+    if (!is_number(a) || !is_number(b)) {
+        BIF_ERROR(env->proc, BADARITH);
+    }
+
+    result = stimes_2(env->proc, a, b);
+    return enif_make_copy(env, result);
+}
+
+ERL_NIF_TERM enif_divide(ErlNifEnv* env, ERL_NIF_TERM a, ERL_NIF_TERM b)
+{
+    Eterm result;
+
+    if (!is_number(a) || !is_number(b)) {
+        BIF_ERROR(env->proc, BADARITH);
+    }
+
+    if (b == SMALL_ZERO) {
+        BIF_ERROR(env->proc, BADARITH);
+    }
+
+    result = div_2(env->proc, a, b);
+    return enif_make_copy(env, result);
+}
+
+ERL_NIF_TERM enif_integer_divide(ErlNifEnv* env, ERL_NIF_TERM a, ERL_NIF_TERM b)
+{
+    Eterm result;
+
+    if (!is_integer(a) || !is_integer(b)) {
+        BIF_ERROR(env->proc, BADARITH);
+    }
+
+    if (b == SMALL_ZERO) {
+        BIF_ERROR(env->proc, BADARITH);
+    }
+
+    result = intdiv_2(env->proc, a, b);
+    return enif_make_copy(env, result);
+}
+
+ERL_NIF_TERM enif_remainder(ErlNifEnv* env, ERL_NIF_TERM a, ERL_NIF_TERM b)
+{
+    Eterm result;
+
+    if (!is_integer(a) || !is_integer(b)) {
+        BIF_ERROR(env->proc, BADARITH);
+    }
+
+    if (b == SMALL_ZERO) {
+        BIF_ERROR(env->proc, BADARITH);
+    }
+
+    result = rem_2(env->proc, a, b);
+    return enif_make_copy(env, result);
+}
+
+ERL_NIF_TERM enif_band(ErlNifEnv* env, ERL_NIF_TERM a, ERL_NIF_TERM b)
+{
+    Eterm result;
+
+    if (!is_integer(a) || !is_integer(b)) {
+        BIF_ERROR(env->proc, BADARITH);
+    }
+
+    result = band_2(env->proc, a, b);
+    return enif_make_copy(env, result);
+}
+
+ERL_NIF_TERM enif_bor(ErlNifEnv* env, ERL_NIF_TERM a, ERL_NIF_TERM b)
+{
+    Eterm result;
+
+    if (!is_integer(a) || !is_integer(b)) {
+        BIF_ERROR(env->proc, BADARITH);
+    }
+
+    result = bor_2(env->proc, a, b);
+    return enif_make_copy(env, result);
+}
+
+ERL_NIF_TERM enif_bxor(ErlNifEnv* env, ERL_NIF_TERM a, ERL_NIF_TERM b)
+{
+    Eterm result;
+
+    if (!is_integer(a) || !is_integer(b)) {
+        BIF_ERROR(env->proc, BADARITH);
+    }
+
+    result = bxor_2(env->proc, a, b);
+    return enif_make_copy(env, result);
+}
+
+ERL_NIF_TERM enif_bnot(ErlNifEnv* env, ERL_NIF_TERM a)
+{
+    Eterm result;
+
+    if (!is_integer(a)) {
+        BIF_ERROR(env->proc, BADARITH);
+    }
+
+    result = bnot_1(env->proc, a);
+    return enif_make_copy(env, result);
+}
+
+ERL_NIF_TERM enif_bsl(ErlNifEnv* env, ERL_NIF_TERM a, ERL_NIF_TERM b)
+{
+    Eterm result;
+
+    if (!is_integer(a) || !is_integer(b)) {
+        BIF_ERROR(env->proc, BADARITH);
+    }
+
+    result = bsl_2(env->proc, a, b);
+    return enif_make_copy(env, result);
+}
+
+ERL_NIF_TERM enif_bsr(ErlNifEnv* env, ERL_NIF_TERM a, ERL_NIF_TERM b)
+{
+    Eterm result;
+
+    if (!is_integer(a) || !is_integer(b)) {
+        BIF_ERROR(env->proc, BADARITH);
+    }
+
+    result = bsr_2(env->proc, a, b);
+    return enif_make_copy(env, result);
+}
+
 static void aligned_binary_dtor(struct enif_tmp_obj_t* obj)
 {
     erts_free_aligned_binary_bytes_extra((byte*)obj,ERTS_ALC_T_TMP);

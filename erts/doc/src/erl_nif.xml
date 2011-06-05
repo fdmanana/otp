@@ -692,6 +692,62 @@ typedef enum {
       <fsummary>Determine if a term is an exception</fsummary>
       <desc><p>Return true if <c>term</c> is an exception.</p></desc>
     </func>
+    <func><name><ret>int</ret><nametext>enif_is_number(ErlNifEnv* env, ERL_NIF_TERM term)</nametext></name>
+      <fsummary>Determine if a term is a number (integer or float)</fsummary>
+      <desc><p>Return true if <c>term</c> is a number.</p></desc>
+    </func>
+    <func><name><ret>int</ret><nametext>enif_is_big_number(ErlNifEnv* env, ERL_NIF_TERM term)</nametext></name>
+      <fsummary>Determine if a term is a big number (not representable in 32 or 64 bits).</fsummary>
+      <desc><p>Return true if <c>term</c> is a big number.</p></desc>
+    </func>
+    <func><name><ret>ERL_NIF_TERM</ret><nametext>enif_sum(ErlNifEnv* env, ERL_NIF_TERM a, ERL_NIF_TERM b)</nametext></name>
+      <fsummary>Sums two numbers (both, one or none can be big numbers).</fsummary>
+      <desc><p>Returns the sum of <c>a</c> and <c>b</c>.</p></desc>
+    </func>
+    <func><name><ret>ERL_NIF_TERM</ret><nametext>enif_subtract(ErlNifEnv* env, ERL_NIF_TERM a, ERL_NIF_TERM b)</nametext></name>
+      <fsummary>Subtracts two numbers (both, one or none can be big numbers).</fsummary>
+      <desc><p>Returns the difference between <c>a</c> and <c>b</c>.</p></desc>
+    </func>
+    <func><name><ret>ERL_NIF_TERM</ret><nametext>enif_multiply(ErlNifEnv* env, ERL_NIF_TERM a, ERL_NIF_TERM b)</nametext></name>
+      <fsummary>Multiplies two numbers (both, one or none can be big numbers).</fsummary>
+      <desc><p>Returns the multiplication of <c>a</c> by <c>b</c>.</p></desc>
+    </func>
+    <func><name><ret>ERL_NIF_TERM</ret><nametext>enif_divide(ErlNifEnv* env, ERL_NIF_TERM a, ERL_NIF_TERM b)</nametext></name>
+      <fsummary>Divides two numbers (both, one or none can be big numbers).</fsummary>
+      <desc><p>Returns the division of <c>a</c> by <c>b</c>.</p></desc>
+    </func>
+    <func><name><ret>ERL_NIF_TERM</ret><nametext>enif_integer_divide(ErlNifEnv* env, ERL_NIF_TERM a, ERL_NIF_TERM b)</nametext></name>
+      <fsummary>Divides two integers (both, one or none can be big numbers).</fsummary>
+      <desc><p>Returns the integer division of <c>a</c> by <c>b</c>.</p></desc>
+    </func>
+    <func><name><ret>ERL_NIF_TERM</ret><nametext>enif_remainder(ErlNifEnv* env, ERL_NIF_TERM a, ERL_NIF_TERM b)</nametext></name>
+      <fsummary>Calculates the remainder of an integer division (both, one or none of the operands can be big numbers).</fsummary>
+      <desc><p>Returns the remainder of the division of <c>a</c> by <c>b</c>.</p></desc>
+    </func>
+    <func><name><ret>ERL_NIF_TERM</ret><nametext>enif_band(ErlNifEnv* env, ERL_NIF_TERM a, ERL_NIF_TERM b)</nametext></name>
+      <fsummary>Calculates the bitwise 'and' between two integers (both, one or none of the operands can be big numbers).</fsummary>
+      <desc><p>Returns the bitwise 'and' between <c>a</c> and <c>b</c>.</p></desc>
+    </func>
+    <func><name><ret>ERL_NIF_TERM</ret><nametext>enif_bor(ErlNifEnv* env, ERL_NIF_TERM a, ERL_NIF_TERM b)</nametext></name>
+      <fsummary>Calculates the bitwise 'or' between two integers (both, one or none of the operands can be big numbers).</fsummary>
+      <desc><p>Returns the bitwise 'or' between <c>a</c> and <c>b</c>.</p></desc>
+    </func>
+    <func><name><ret>ERL_NIF_TERM</ret><nametext>enif_bxor(ErlNifEnv* env, ERL_NIF_TERM a, ERL_NIF_TERM b)</nametext></name>
+      <fsummary>Calculates the bitwise 'xor' between two integers (both, one or none of the operands can be big numbers).</fsummary>
+      <desc><p>Returns the bitwise 'xor' between <c>a</c> and <c>b</c>.</p></desc>
+    </func>
+    <func><name><ret>ERL_NIF_TERM</ret><nametext>enif_bnot(ErlNifEnv* env, ERL_NIF_TERM integer)</nametext></name>
+      <fsummary>Calculates the bitwise 'not' of the given integer (it can be a big number).</fsummary>
+      <desc><p>Returns the bitwise 'not' of <c>integer</c>.</p></desc>
+    </func>
+    <func><name><ret>ERL_NIF_TERM</ret><nametext>enif_bsl(ErlNifEnv* env, ERL_NIF_TERM a, ERL_NIF_TERM b)</nametext></name>
+      <fsummary>Calculates a bitwise 'left shift' (both, one or none of the operands can be big numbers).</fsummary>
+      <desc><p>Returns the bitwise 'left shift' of <c>a</c> by <c>b</c> units.</p></desc>
+    </func>
+    <func><name><ret>ERL_NIF_TERM</ret><nametext>enif_bsr(ErlNifEnv* env, ERL_NIF_TERM a, ERL_NIF_TERM b)</nametext></name>
+      <fsummary>Calculates a bitwise 'right shift' (both, one or none of the operands can be big numbers).</fsummary>
+      <desc><p>Returns the bitwise 'right shift' of <c>a</c> by <c>b</c> units.</p></desc>
+    </func>
     <func><name><ret>int</ret><nametext>enif_is_fun(ErlNifEnv* env, ERL_NIF_TERM term)</nametext></name>
       <fsummary>Determine if a term is a fun</fsummary>
       <desc><p>Return true if <c>term</c> is a fun.</p></desc>

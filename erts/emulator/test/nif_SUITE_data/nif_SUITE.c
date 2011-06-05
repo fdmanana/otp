@@ -781,6 +781,8 @@ static ERL_NIF_TERM release_resource(ErlNifEnv* env, int argc, const ERL_NIF_TER
  * argv[7] an empty list
  * argv[8] a non-empty list
  * argv[9] a tuple
+ * argv[10] a number (small, big integer or float)
+ * argv[11] a big number
  */
 static ERL_NIF_TERM check_is(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
 {
@@ -797,6 +799,8 @@ static ERL_NIF_TERM check_is(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[]
     if (!enif_is_list(env, argv[7])) return enif_make_badarg(env);
     if (!enif_is_list(env, argv[8])) return enif_make_badarg(env);
     if (!enif_is_tuple(env, argv[9])) return enif_make_badarg(env);
+    if (!enif_is_number(env, argv[10])) return enif_make_badarg(env);
+    if (!enif_is_big_number(env, argv[11])) return enif_make_badarg(env);
 
     return ok_atom;
 }
@@ -1373,6 +1377,66 @@ static ERL_NIF_TERM send_term(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[
     return enif_make_int(env, ret);
 }
 
+static ERL_NIF_TERM sum_numbers(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
+{
+    return enif_sum(env, argv[0], argv[1]);
+}
+
+static ERL_NIF_TERM subtract_numbers(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
+{
+    return enif_subtract(env, argv[0], argv[1]);
+}
+
+static ERL_NIF_TERM multiply_numbers(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
+{
+    return enif_multiply(env, argv[0], argv[1]);
+}
+
+static ERL_NIF_TERM divide_numbers(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
+{
+    return enif_divide(env, argv[0], argv[1]);
+}
+
+static ERL_NIF_TERM int_divide_numbers(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
+{
+    return enif_integer_divide(env, argv[0], argv[1]);
+}
+
+static ERL_NIF_TERM remainder_numbers(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
+{
+    return enif_remainder(env, argv[0], argv[1]);
+}
+
+static ERL_NIF_TERM band_numbers(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
+{
+    return enif_band(env, argv[0], argv[1]);
+}
+
+static ERL_NIF_TERM bor_numbers(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
+{
+    return enif_bor(env, argv[0], argv[1]);
+}
+
+static ERL_NIF_TERM bxor_numbers(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
+{
+    return enif_bxor(env, argv[0], argv[1]);
+}
+
+static ERL_NIF_TERM bnot_number(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
+{
+    return enif_bnot(env, argv[0]);
+}
+
+static ERL_NIF_TERM bsl_number(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
+{
+    return enif_bsl(env, argv[0], argv[1]);
+}
+
+static ERL_NIF_TERM bsr_number(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
+{
+    return enif_bsr(env, argv[0], argv[1]);
+}
+
 static ErlNifFunc nif_funcs[] =
 {
     {"lib_version", 0, lib_version},
@@ -1399,7 +1463,7 @@ static ErlNifFunc nif_funcs[] =
     {"release_resource", 1, release_resource},
     {"last_resource_dtor_call", 0, last_resource_dtor_call},
     {"make_new_resource", 2, make_new_resource},
-    {"check_is", 10, check_is},
+    {"check_is", 12, check_is},
     {"check_is_exception", 0, check_is_exception},
     {"length_test", 5, length_test},
     {"make_atoms", 0, make_atoms},
@@ -1417,7 +1481,19 @@ static ErlNifFunc nif_funcs[] =
     {"send_blob_thread", 3, send_blob_thread},
     {"join_send_thread", 1, join_send_thread},
     {"copy_blob", 1, copy_blob},
-    {"send_term", 2, send_term}
+    {"send_term", 2, send_term},
+    {"sum_numbers", 2, sum_numbers},
+    {"subtract_numbers", 2, subtract_numbers},
+    {"multiply_numbers", 2, multiply_numbers},
+    {"divide_numbers", 2, divide_numbers},
+    {"int_divide_numbers", 2, int_divide_numbers},
+    {"remainder_numbers", 2, remainder_numbers},
+    {"band_numbers", 2, band_numbers},
+    {"bor_numbers", 2, bor_numbers},
+    {"bxor_numbers", 2, bxor_numbers},
+    {"bnot_number", 1, bnot_number},
+    {"bsl_number", 2, bsl_number},
+    {"bsr_number", 2, bsr_number}
 };
 
 ERL_NIF_INIT(nif_SUITE,nif_funcs,load,reload,upgrade,unload)
