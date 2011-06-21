@@ -666,7 +666,7 @@ typedef enum {
       <c>bin_term</c>. Return true on success or false if <c>bin_term</c> is not a binary.</p></desc> 
     </func>
     <func><name><ret>int</ret><nametext>enif_inspect_iolist_as_binary(ErlNifEnv* 
-                                env, ERL_NIF_TERM term, ErlNifBinary* bin)
+                                env, ERL_NIF_TERM iolist, ErlNifBinary* bin)
                               </nametext></name>
       <fsummary>Inspect the content of an iolist</fsummary>
       <desc><p>Initialize the structure pointed to by <c>bin</c> with one
